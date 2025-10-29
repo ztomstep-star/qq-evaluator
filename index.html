@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QQ号评估器</title>
+    <style>
+        body { font-family: Arial; max-width: 600px; margin: 50px auto; padding: 20px; }
+        .container { background: #f9f9f9; padding: 30px; border-radius: 10px; }
+        input, button { padding: 10px; margin: 5px; font-size: 16px; }
+        button { background: #12b7f5; color: white; border: none; cursor: pointer; }
+        .result { margin-top: 20px; padding: 15px; background: white; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>QQ号评估器</h1>
+        <p>请输入你的QQ号进行评估：</p>
+        <input type="text" id="qqInput" placeholder="输入QQ号">
+        <button onclick="evaluate()">开始评估</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function evaluate() {
+            const qq = document.getElementById('qqInput').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!qq) {
+                resultDiv.innerHTML = "<p style='color:red'>请输入QQ号</p>";
+                return;
+            }
+            
+            if (!/^\d+$/.test(qq)) {
+                resultDiv.innerHTML = "<p style='color:red'>QQ号必须是纯数字</p>";
+                return;
+            }
+            
+            // 简单评估逻辑
+            let score = 50;
+            if (qq.length <= 7) score += 20;
+            if (qq.includes('888')) score += 10;
+            if (qq.includes('666')) score += 10;
+            
+            resultDiv.innerHTML = `
+                <h3>评估结果</h3>
+                <p>QQ号: ${qq}</p>
+                <p>评分: ${score}/100</p>
+                <p>分析: 这是一个${score > 70 ? '不错' : '普通'}的QQ号</p>
+            `;
+        }
+    </script>
+</body>
+</html>
