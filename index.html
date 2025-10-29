@@ -1,627 +1,292 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QQ号码评估分析系统</title>
-    <style>
-        :root {
-            --primary: #1890ff;
-            --success: #52c41a;
-            --warning: #faad14;
-            --error: #f5222d;
-            --purple: #722ed1;
-            --cyan: #13c2c2;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-            padding: 20px;
-        }
-        
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-        
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-        
-        .input-section {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        
-        .input-group {
-            display: flex;
-            gap: 15px;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-        
-        input {
-            flex: 1;
-            padding: 15px 20px;
-            border: 2px solid #e8e8e8;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
-        }
-        
-        button {
-            background: linear-gradient(135deg, var(--primary), #0050b3);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(24, 144, 255, 0.4);
-        }
-        
-        .result-section {
-            display: none;
-            animation: fadeIn 0.8s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .profile-card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 30px;
-            align-items: start;
-        }
-        
-        .avatar-section {
-            text-align: center;
-        }
-        
-        .avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 20px;
-            background: linear-gradient(135deg, #ff6b6b, #feca57);
-            margin-bottom: 15px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .vip-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: linear-gradient(135deg, #ffd700, #ff6b00);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .level {
-            background: linear-gradient(135deg, var(--primary), #0050b3);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            display: inline-block;
-        }
-        
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        
-        .info-card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid var(--primary);
-        }
-        
-        .info-card h3 {
-            color: var(--primary);
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-        
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #e8e8e8;
-        }
-        
-        .info-item:last-child {
-            margin-bottom: 0;
-            border-bottom: none;
-        }
-        
-        .analysis-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .analysis-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-        
-        .analysis-card h3 {
-            color: var(--primary);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .score-display {
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        .score {
-            font-size: 3em;
-            font-weight: bold;
-            background: linear-gradient(135deg, var(--primary), var(--purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .score-bar {
-            height: 8px;
-            background: #f0f0f0;
-            border-radius: 4px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
-        
-        .score-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--error), var(--warning), var(--success));
-            border-radius: 4px;
-            transition: width 1s ease;
-        }
-        
-        .feature-list {
-            list-style: none;
-        }
-        
-        .feature-list li {
-            padding: 10px 0;
-            border-bottom: 1px solid #f0f0f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .feature-list li:last-child {
-            border-bottom: none;
-        }
-        
-        .badge {
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .badge-high {
-            background: #f6ffed;
-            color: var(--success);
-            border: 1px solid #b7eb8f;
-        }
-        
-        .badge-medium {
-            background: #fff7e6;
-            color: var(--warning);
-            border: 1px solid #ffd591;
-        }
-        
-        .badge-low {
-            background: #fff2f0;
-            color: var(--error);
-            border: 1px solid #ffccc7;
-        }
-        
-        .radar-chart {
-            width: 100%;
-            height: 200px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #666;
-            font-weight: bold;
-        }
-        
-        @media (max-width: 768px) {
-            .profile-card {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-            
-            .input-group {
-                flex-direction: column;
-            }
-            
-            .analysis-section {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>QQ估价查询 - 精简版</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --bg: #f3f4f6;
+    --card-bg: #ffffff;
+    --radius: 14px;
+    --shadow: 0 4px 18px rgba(0,0,0,0.05);
+    --transition: all 0.25s ease;
+  }
+  body {
+    margin: 0;
+    background: var(--bg);
+    font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    color: #1f2937;
+  }
+  header {
+    text-align: center;
+    padding: 40px 16px 16px;
+  }
+  header h1 {
+    font-size: 28px;
+    margin: 0;
+    background: linear-gradient(90deg, #2563eb, #60a5fa);
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  header p {
+    color: #6b7280;
+    margin-top: 8px;
+    font-size: 14px;
+  }
+  .container {
+    max-width: 900px;
+    margin: auto;
+    padding: 0 16px 50px;
+  }
+  .card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    transition: var(--transition);
+  }
+  .search-box {
+    display: flex;
+    gap: 10px;
+  }
+  input[type=text] {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: var(--radius);
+    border: 1px solid #d1d5db;
+    font-size: 15px;
+    transition: var(--transition);
+  }
+  input[type=text]:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+  }
+  button {
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    font-size: 15px;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  button:hover {
+    background: #1d4ed8;
+  }
+  .muted {
+    color: #6b7280;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+  .result {
+    margin-top: 24px;
+    display: none;
+  }
+  .profile {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 14px;
+    object-fit: cover;
+    border: 3px solid #e5e7eb;
+  }
+  .nickname {
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .signature {
+    color: #6b7280;
+    margin-top: 4px;
+  }
+  .info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .info-item {
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 14px;
+    box-shadow: inset 0 0 0 1px #e5e7eb;
+  }
+  .estimate-box {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #2563eb, #60a5fa);
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  .confidence {
+    text-align: center;
+    font-size: 13px;
+    color: #6b7280;
+  }
+  .actions {
+    margin-top: 14px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  .secondary {
+    background: #10b981;
+  }
+  footer {
+    text-align: center;
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 20px;
+  }
+  @media (max-width: 700px) {
+    .info { grid-template-columns: 1fr; }
+    .profile { flex-direction: column; text-align: center; }
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>QQ号码评估分析系统</h1>
-            <p>专业分析QQ号码价值与特点 · 模拟数据展示</p>
+  <header>
+    <h1>QQ估价查询</h1>
+    <p>输入QQ号即可获取资料并生成估价（演示用，不收集数据）</p>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <div class="search-box">
+        <input id="qqInput" type="text" placeholder="请输入 QQ 号 (例如 12345678)" />
+        <button id="btnSearch">查询</button>
+      </div>
+      <div class="muted" id="msg"></div>
+
+      <div class="result" id="resultArea">
+        <div class="profile">
+          <img id="avatar" class="avatar" />
+          <div>
+            <div class="nickname" id="nickname"></div>
+            <div class="signature" id="signature"></div>
+          </div>
         </div>
-        
-        <div class="input-section">
-            <div class="input-group">
-                <input type="text" id="qqInput" placeholder="请输入QQ号码进行模拟分析" maxlength="11">
-                <button id="analyzeBtn">开始分析</button>
-            </div>
-            <p style="margin-top: 15px; color: #666; font-size: 14px;">
-                提示：本系统使用模拟数据展示效果，不获取真实用户信息
-            </p>
+
+        <div class="info" id="infoList"></div>
+
+        <div class="estimate-box" id="estimate"></div>
+        <div class="confidence" id="confidence"></div>
+
+        <div class="actions">
+          <button id="btnEstimate">开始估价</button>
+          <button id="btnExport" class="secondary">导出 JSON</button>
         </div>
-        
-        <div class="result-section" id="resultSection">
-            <!-- 用户资料卡片 -->
-            <div class="profile-card">
-                <div class="avatar-section">
-                    <div class="avatar">
-                        <div class="vip-badge">SVIP7</div>
-                    </div>
-                    <div class="level" id="levelDisplay">等级：108级</div>
-                </div>
-                
-                <div class="info-grid">
-                    <div class="info-card">
-                        <h3>基本信息</h3>
-                        <div class="info-item">
-                            <span>昵称：</span>
-                            <span id="nickname">阳光男孩</span>
-                        </div>
-                        <div class="info-item">
-                            <span>QQ号：</span>
-                            <span id="qqNumber">123456789</span>
-                        </div>
-                        <div class="info-item">
-                            <span>个性签名：</span>
-                            <span id="signature">努力成为更好的自己！</span>
-                        </div>
-                    </div>
-                    
-                    <div class="info-card">
-                        <h3>账号信息</h3>
-                        <div class="info-item">
-                            <span>注册时间：</span>
-                            <span id="registerTime">2015-08-20 14:30:25</span>
-                        </div>
-                        <div class="info-item">
-                            <span>QQ年龄：</span>
-                            <span id="qqAge">8年4个月</span>
-                        </div>
-                        <div class="info-item">
-                            <span>会员等级：</span>
-                            <span id="vipLevel">超级会员7级</span>
-                        </div>
-                    </div>
-                    
-                    <div class="info-card">
-                        <h3>资料信息</h3>
-                        <div class="info-item">
-                            <span>年龄：</span>
-                            <span id="age">25岁</span>
-                        </div>
-                        <div class="info-item">
-                            <span>地区：</span>
-                            <span id="location">广东 深圳</span>
-                        </div>
-                        <div class="info-item">
-                            <span>星座：</span>
-                            <span id="constellation">狮子座</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 分析结果 -->
-            <div class="analysis-section">
-                <div class="analysis-card">
-                    <h3>📊 综合评分</h3>
-                    <div class="score-display">
-                        <div class="score" id="totalScore">0</div>
-                        <div>号码价值评分</div>
-                    </div>
-                    <div class="score-bar">
-                        <div class="score-fill" id="scoreFill"></div>
-                    </div>
-                    <div style="text-align: center; color: #666; font-size: 14px;" id="scoreComment">
-                        正在评估中...
-                    </div>
-                </div>
-                
-                <div class="analysis-card">
-                    <h3>⭐ 号码特性</h3>
-                    <ul class="feature-list">
-                        <li>
-                            <span>号码长度</span>
-                            <span class="badge badge-high" id="lengthBadge">9位</span>
-                        </li>
-                        <li>
-                            <span>重复数字</span>
-                            <span class="badge badge-medium" id="repeatBadge">3位重复</span>
-                        </li>
-                        <li>
-                            <span>连续数字</span>
-                            <span class="badge badge-low" id="consecutiveBadge">无连续</span>
-                        </li>
-                        <li>
-                            <span>特殊组合</span>
-                            <span class="badge badge-high" id="specialBadge">包含888</span>
-                        </li>
-                        <li>
-                            <span>对称性</span>
-                            <span class="badge badge-low" id="symmetryBadge">不对称</span>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div class="analysis-card">
-                    <h3>🏆 排名信息</h3>
-                    <div class="radar-chart">
-                        全国排名：<span id="nationalRank">前5%</span>
-                    </div>
-                    <ul class="feature-list">
-                        <li>
-                            <span>稀有度排名</span>
-                            <span id="rarityRank">前3%</span>
-                        </li>
-                        <li>
-                            <span>价值排名</span>
-                            <span id="valueRank">前5%</span>
-                        </li>
-                        <li>
-                            <span>美观度排名</span>
-                            <span id="beautyRank">前8%</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const analyzeBtn = document.getElementById('analyzeBtn');
-            const resultSection = document.getElementById('resultSection');
-            
-            analyzeBtn.addEventListener('click', analyzeQQ);
-            
-            function analyzeQQ() {
-                const qqInput = document.getElementById('qqInput').value.trim();
-                
-                if (!qqInput) {
-                    alert('请输入QQ号码');
-                    return;
-                }
-                
-                if (!/^\d+$/.test(qqInput)) {
-                    alert('QQ号必须为纯数字');
-                    return;
-                }
-                
-                if (qqInput.length < 5 || qqInput.length > 11) {
-                    alert('QQ号长度应在5-11位之间');
-                    return;
-                }
-                
-                // 生成模拟数据
-                const mockData = generateMockData(qqInput);
-                
-                // 更新界面
-                updateDisplay(mockData);
-                
-                // 显示结果
-                resultSection.style.display = 'block';
-                
-                // 滚动到结果
-                resultSection.scrollIntoView({ behavior: 'smooth' });
-            }
-            
-            function generateMockData(qq) {
-                // 基于QQ号生成确定性但随机的模拟数据
-                const seed = qq.split('').reduce((a, b) => a + parseInt(b), 0);
-                
-                // 虚拟昵称库
-                const nicknames = ['阳光男孩', '星空梦想家', '清风明月', '科技先锋', '快乐小天使', '奋斗青年', '智慧学者'];
-                const signatures = [
-                    '努力成为更好的自己！',
-                    '生活不止眼前的苟且，还有诗和远方',
-                    '保持热爱，奔赴山海',
-                    '简单生活，快乐每一天',
-                    '梦想还是要有的，万一实现了呢'
-                ];
-                const locations = ['北京 海淀', '上海 浦东', '广东 深圳', '浙江 杭州', '四川 成都'];
-                const constellations = ['白羊座', '金牛座', '双子座', '巨蟹座', '狮子座', '处女座'];
-                
-                return {
-                    qq: qq,
-                    nickname: nicknames[seed % nicknames.length],
-                    signature: signatures[seed % signatures.length],
-                    registerTime: `201${seed % 10}-${String((seed % 12) + 1).padStart(2, '0')}-${String((seed % 28) + 1).padStart(2, '0')} ${String(seed % 24).padStart(2, '0')}:${String((seed * 3) % 60).padStart(2, '0')}:${String((seed * 7) % 60).padStart(2, '0')}`,
-                    qqAge: `${8 + (seed % 5)}年${seed % 12}个月`,
-                    vipLevel: `超级会员${(seed % 7) + 1}级`,
-                    level: `等级：${80 + (seed * 3) % 50}`,
-                    age: `${20 + (seed % 15)}岁`,
-                    location: locations[seed % locations.length],
-                    constellation: constellations[seed % constellations.length],
-                    score: 50 + (seed * 7) % 50,
-                    nationalRank: `前${5 + (seed % 20)}%`,
-                    rarityRank: `前${3 + (seed % 15)}%`,
-                    valueRank: `前${5 + (seed % 20)}%`,
-                    beautyRank: `前${8 + (seed % 20)}%`
-                };
-            }
-            
-            function updateDisplay(data) {
-                // 更新基本信息
-                document.getElementById('qqNumber').textContent = data.qq;
-                document.getElementById('nickname').textContent = data.nickname;
-                document.getElementById('signature').textContent = data.signature;
-                document.getElementById('registerTime').textContent = data.registerTime;
-                document.getElementById('qqAge').textContent = data.qqAge;
-                document.getElementById('vipLevel').textContent = data.vipLevel;
-                document.getElementById('levelDisplay').textContent = data.level;
-                document.getElementById('age').textContent = data.age;
-                document.getElementById('location').textContent = data.location;
-                document.getElementById('constellation').textContent = data.constellation;
-                
-                // 更新评分
-                document.getElementById('totalScore').textContent = data.score;
-                document.getElementById('scoreFill').style.width = data.score + '%';
-                
-                // 更新评分评语
-                let comment = '';
-                if (data.score >= 90) comment = '🌟 极品号码！极为稀有';
-                else if (data.score >= 80) comment = '⭐ 优秀号码！非常珍贵';
-                else if (data.score >= 70) comment = '👍 良好号码！值得收藏';
-                else if (data.score >= 60) comment = '💫 不错号码！有一定价值';
-                else comment = '📱 普通号码！日常使用';
-                document.getElementById('scoreComment').textContent = comment;
-                
-                // 更新排名
-                document.getElementById('nationalRank').textContent = data.nationalRank;
-                document.getElementById('rarityRank').textContent = data.rarityRank;
-                document.getElementById('valueRank').textContent = data.valueRank;
-                document.getElementById('beautyRank').textContent = data.beautyRank;
-                
-                // 更新特性分析（基于QQ号数字）
-                updateFeaturesAnalysis(data.qq);
-            }
-            
-            function updateFeaturesAnalysis(qq) {
-                const length = qq.length;
-                const repeated = countRepeatedDigits(qq);
-                const consecutive = countConsecutiveDigits(qq);
-                const hasSpecial = hasSpecialNumbers(qq);
-                const isSymmetric = checkSymmetry(qq);
-                
-                // 更新特性标签
-                document.getElementById('lengthBadge').textContent = `${length}位`;
-                document.getElementById('lengthBadge').className = `badge ${length <= 7 ? 'badge-high' : length <= 8 ? 'badge-medium' : 'badge-low'}`;
-                
-                document.getElementById('repeatBadge').textContent = repeated > 1 ? `${repeated}位重复` : '无重复';
-                document.getElementById('repeatBadge').className = `badge ${repeated >= 3 ? 'badge-high' : repeated >= 2 ? 'badge-medium' : 'badge-low'}`;
-                
-                document.getElementById('consecutiveBadge').textContent = consecutive > 1 ? `${consecutive}位连续` : '无连续';
-                document.getElementById('consecutiveBadge').className = `badge ${consecutive >= 3 ? 'badge-high' : consecutive >= 2 ? 'badge-medium' : 'badge-low'}`;
-                
-                document.getElementById('specialBadge').textContent = hasSpecial ? '有特殊组合' : '无特殊';
-                document.getElementById('specialBadge').className = `badge ${hasSpecial ? 'badge-high' : 'badge-low'}`;
-                
-                document.getElementById('symmetryBadge').textContent = isSymmetric ? '对称' : '不对称';
-                document.getElementById('symmetryBadge').className = `badge ${isSymmetric ? 'badge-high' : 'badge-low'}`;
-            }
-            
-            function countRepeatedDigits(qq) {
-                let maxRepeat = 1;
-                for (let i = 0; i < qq.length; i++) {
-                    let count = 1;
-                    for (let j = i + 1; j < qq.length; j++) {
-                        if (qq[j] === qq[i]) count++;
-                        else break;
-                    }
-                    maxRepeat = Math.max(maxRepeat, count);
-                }
-                return maxRepeat;
-            }
-            
-            function countConsecutiveDigits(qq) {
-                let maxConsecutive = 1;
-                for (let i = 0; i < qq.length - 1; i++) {
-                    if (parseInt(qq[i+1]) === parseInt(qq[i]) + 1) {
-                        let count = 2;
-                        for (let j = i + 2; j < qq.length; j++) {
-                            if (parseInt(qq[j]) === parseInt(qq[j-1]) + 1) count++;
-                            else break;
-                        }
-                        maxConsecutive = Math.max(maxConsecutive, count);
-                    }
-                }
-                return maxConsecutive;
-            }
-            
-            function hasSpecialNumbers(qq) {
-                return qq.includes('888') || qq.includes('666') || qq.includes('520') || qq.includes('1314');
-            }
-            
-            function checkSymmetry(qq) {
-                for (let i = 0; i < Math.floor(qq.length / 2); i++) {
-                    if (qq[i] !== qq[qq.length - 1 - i]) return false;
-                }
-                return true;
-            }
-        });
-    </script>
+    <footer>©2025 QQ估价查询演示版 | 不存储任何查询数据</footer>
+  </div>
+
+<script>
+const el = {
+  qqInput: document.getElementById('qqInput'),
+  btnSearch: document.getElementById('btnSearch'),
+  msg: document.getElementById('msg'),
+  result: document.getElementById('resultArea'),
+  avatar: document.getElementById('avatar'),
+  nickname: document.getElementById('nickname'),
+  signature: document.getElementById('signature'),
+  infoList: document.getElementById('infoList'),
+  estimate: document.getElementById('estimate'),
+  confidence: document.getElementById('confidence'),
+  btnEstimate: document.getElementById('btnEstimate'),
+  btnExport: document.getElementById('btnExport')
+};
+
+// mock 生成
+function mockProfile(qq){
+  const seed = Number(qq.slice(-5)) || 12345;
+  const rand = (m,n)=>m+(seed%1000)/1000*(n-m);
+  return {
+    qq,
+    avatarUrl: `https://q1.qlogo.cn/g?b=qq&nk=${qq}&s=640`,
+    nickname: "用户" + qq.slice(-3),
+    signature: "个性签名示例 #" + seed % 999,
+    filledAge: 18 + seed % 20,
+    filledAddress: ["北京","上海","广州","深圳","杭州"][seed % 5],
+    currentLevel: 10 + seed % 60,
+    vipLevel: seed % 7,
+    qqAgeYears: 3 + seed % 15,
+    registrationTimeIso: new Date(Date.now() - (3+seed%15)*365*24*3600*1000).toISOString(),
+    nationalRank: 10000 + seed % 900000,
+    friendsCount: 50 + seed % 500,
+    boundPhone: seed % 2 === 0,
+    boundWechat: seed % 3 === 0
+  };
+}
+
+function validateQq(q){
+  return /^[1-9]\d{4,10}$/.test(q);
+}
+
+el.btnSearch.addEventListener('click', ()=>{
+  const qq = el.qqInput.value.trim();
+  if(!validateQq(qq)){ el.msg.textContent="请输入正确的QQ号"; return; }
+  el.msg.textContent = "加载中...";
+  const p = mockProfile(qq);
+  showProfile(p);
+  el.msg.textContent = "查询成功";
+});
+
+function showProfile(p){
+  el.result.style.display = 'block';
+  el.avatar.src = p.avatarUrl;
+  el.nickname.textContent = p.nickname + "（QQ：" + p.qq + "）";
+  el.signature.textContent = p.signature;
+  el.infoList.innerHTML = `
+    <div class="info-item">资料年龄：${p.filledAge}</div>
+    <div class="info-item">地区：${p.filledAddress}</div>
+    <div class="info-item">等级：${p.currentLevel}</div>
+    <div class="info-item">会员等级：${p.vipLevel}</div>
+    <div class="info-item">QQ年龄：${p.qqAgeYears}年</div>
+    <div class="info-item">注册时间：${new Date(p.registrationTimeIso).toLocaleDateString()}</div>
+    <div class="info-item">全国排名：${p.nationalRank}</div>
+    <div class="info-item">好友数：${p.friendsCount}</div>
+  `;
+  window.lastProfile = p;
+  el.estimate.textContent = "";
+  el.confidence.textContent = "";
+}
+
+// 估价算法
+el.btnEstimate.addEventListener('click', ()=>{
+  const p = window.lastProfile;
+  if(!p){ el.msg.textContent = "请先查询"; return; }
+
+  const score = (p.qqAgeYears*2 + p.currentLevel + p.vipLevel*5 + p.friendsCount/50);
+  const price = (score * 0.8).toFixed(2);
+  const confidence = Math.min(95, 40 + score / 10).toFixed(1);
+
+  el.estimate.textContent = `参考估价：￥${price}`;
+  el.confidence.textContent = `置信度：${confidence}%`;
+});
+
+el.btnExport.addEventListener('click', ()=>{
+  const p = window.lastProfile;
+  if(!p) return;
+  const blob = new Blob([JSON.stringify(p,null,2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `qq-${p.qq}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+</script>
 </body>
 </html>
