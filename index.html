@@ -1,292 +1,122 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QQ号评估器</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Microsoft YaHei', sans-serif;
+        body { 
+            font-family: Arial; 
+            max-width: 500px; 
+            margin: 50px auto; 
+            padding: 20px; 
+            background: #f0f2f5;
         }
-        
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+        .container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
-        .container {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-        }
-        
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
-        
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-        }
-        
-        .input-group {
-            margin: 20px 0;
-        }
-        
-        input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
             font-size: 16px;
-            margin-bottom: 10px;
         }
-        
-        input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        button {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-size: 16px;
+        button { 
+            width: 100%; 
+            padding: 12px; 
+            background: #1890ff; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            font-size: 16px; 
             cursor: pointer;
-            width: 100%;
-            transition: transform 0.2s;
         }
-        
-        button:hover {
-            transform: translateY(-2px);
-        }
-        
-        .result {
-            margin-top: 20px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
+        .result { 
+            margin-top: 20px; 
+            padding: 15px; 
+            background: #f6ffed; 
+            border: 1px solid #b7eb8f; 
+            border-radius: 5px; 
             display: none;
         }
-        
-        .score {
-            font-size: 48px;
-            font-weight: bold;
-            color: #667eea;
-            margin: 10px 0;
-        }
-        
-        .analysis {
-            text-align: left;
-            margin-top: 15px;
-        }
-        
-        .feature {
-            background: white;
-            padding: 10px;
-            margin: 8px 0;
-            border-radius: 5px;
-            border-left: 4px solid #667eea;
-        }
-        
         .error {
-            color: #e74c3c;
-            background: #ffeaea;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
+            background: #fff2f0;
+            border: 1px solid #ffccc7;
+            color: #a8071a;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>QQ号评估器</h1>
-        <p class="subtitle">专业分析QQ号特点与价值</p>
-        
-        <div class="input-group">
-            <input type="text" id="qqInput" placeholder="请输入5-11位QQ号码" maxlength="11">
-            <button id="evaluateBtn">开始评估</button>
-        </div>
+        <p>请输入你的QQ号：</p>
+        <input type="text" id="qqInput" placeholder="例如：123456">
+        <button onclick="evaluateQQ()">开始评估</button>
         
         <div class="result" id="result">
-            <h3>评估结果</h3>
-            <div class="score" id="scoreValue">0</div>
-            <div class="analysis" id="analysis"></div>
+            <!-- 结果将在这里显示 -->
         </div>
     </div>
 
     <script>
-        // 等待页面完全加载
-        document.addEventListener('DOMContentLoaded', function() {
-            const qqInput = document.getElementById('qqInput');
-            const evaluateBtn = document.getElementById('evaluateBtn');
-            const resultDiv = document.getElementById('result');
-            const scoreValue = document.getElementById('scoreValue');
-            const analysisDiv = document.getElementById('analysis');
+        // 简单的评估函数
+        function evaluateQQ() {
+            console.log("按钮被点击了！"); // 调试信息
             
-            // 绑定点击事件
-            evaluateBtn.addEventListener('click', evaluateQQ);
+            var qq = document.getElementById('qqInput').value;
+            var resultDiv = document.getElementById('result');
             
-            // 绑定回车键事件
-            qqInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    evaluateQQ();
-                }
-            });
+            // 显示结果区域
+            resultDiv.style.display = 'block';
             
-            function evaluateQQ() {
-                const qqNumber = qqInput.value.trim();
-                
-                // 验证输入
-                if (!qqNumber) {
-                    showError('请输入QQ号码');
-                    return;
-                }
-                
-                if (!/^\d+$/.test(qqNumber)) {
-                    showError('QQ号必须为纯数字');
-                    return;
-                }
-                
-                if (qqNumber.length < 5 || qqNumber.length > 11) {
-                    showError('QQ号长度应在5-11位之间');
-                    return;
-                }
-                
-                // 执行评估
-                const score = calculateScore(qqNumber);
-                const analysis = generateAnalysis(qqNumber);
-                
-                // 显示结果
-                displayResult(score, analysis, qqNumber);
+            // 验证输入
+            if (!qq) {
+                resultDiv.innerHTML = '<div class="error">请输入QQ号</div>';
+                return;
             }
             
-            function calculateScore(qq) {
-                let score = 50; // 基础分
-                
-                // 长度评分
-                if (qq.length <= 6) score += 25;
-                else if (qq.length <= 7) score += 20;
-                else if (qq.length <= 8) score += 10;
-                
-                // 重复数字
-                const repeated = countRepeatedDigits(qq);
-                if (repeated >= 4) score += 20;
-                else if (repeated >= 3) score += 15;
-                else if (repeated >= 2) score += 5;
-                
-                // 连续数字
-                const consecutive = countConsecutiveDigits(qq);
-                if (consecutive >= 4) score += 20;
-                else if (consecutive >= 3) score += 15;
-                else if (consecutive >= 2) score += 5;
-                
-                // 特殊数字
-                if (qq.includes('888')) score += 15;
-                if (qq.includes('666')) score += 10;
-                if (qq.includes('520')) score += 10;
-                if (qq.includes('1314')) score += 15;
-                
-                return Math.min(score, 100);
+            if (!/^\d+$/.test(qq)) {
+                resultDiv.innerHTML = '<div class="error">QQ号必须是纯数字</div>';
+                return;
             }
             
-            function countRepeatedDigits(qq) {
-                let maxRepeat = 1;
-                let currentRepeat = 1;
-                
-                for (let i = 1; i < qq.length; i++) {
-                    if (qq[i] === qq[i-1]) {
-                        currentRepeat++;
-                        maxRepeat = Math.max(maxRepeat, currentRepeat);
-                    } else {
-                        currentRepeat = 1;
-                    }
-                }
-                
-                return maxRepeat;
+            if (qq.length < 5 || qq.length > 11) {
+                resultDiv.innerHTML = '<div class="error">QQ号长度应为5-11位</div>';
+                return;
             }
             
-            function countConsecutiveDigits(qq) {
-                let maxConsecutive = 1;
-                let currentConsecutive = 1;
-                
-                for (let i = 1; i < qq.length; i++) {
-                    if (parseInt(qq[i]) === parseInt(qq[i-1]) + 1) {
-                        currentConsecutive++;
-                        maxConsecutive = Math.max(maxConsecutive, currentConsecutive);
-                    } else {
-                        currentConsecutive = 1;
-                    }
-                }
-                
-                return maxConsecutive;
-            }
+            // 计算分数
+            var score = 50;
             
-            function generateAnalysis(qq) {
-                let analysis = '';
-                
-                // 长度分析
-                analysis += `<div class="feature">号码长度: ${qq.length}位</div>`;
-                
-                // 重复数字分析
-                const repeated = countRepeatedDigits(qq);
-                if (repeated > 1) {
-                    analysis += `<div class="feature">重复数字: ${repeated}位连续相同</div>`;
-                }
-                
-                // 连续数字分析
-                const consecutive = countConsecutiveDigits(qq);
-                if (consecutive > 1) {
-                    analysis += `<div class="feature">连续数字: ${consecutive}位连续递增</div>`;
-                }
-                
-                // 特殊数字分析
-                if (qq.includes('888')) {
-                    analysis += `<div class="feature">特殊数字: 包含888(发财)</div>`;
-                }
-                if (qq.includes('666')) {
-                    analysis += `<div class="feature">特殊数字: 包含666(顺利)</div>`;
-                }
-                if (qq.includes('520')) {
-                    analysis += `<div class="feature">特殊数字: 包含520(我爱你)</div>`;
-                }
-                if (qq.includes('1314')) {
-                    analysis += `<div class="feature">特殊数字: 包含1314(一生一世)</div>`;
-                }
-                
-                return analysis;
-            }
+            // 长度评分
+            if (qq.length <= 6) score += 30;
+            else if (qq.length <= 7) score += 20;
+            else if (qq.length <= 8) score += 10;
             
-            function displayResult(score, analysis, qqNumber) {
-                scoreValue.textContent = score;
-                analysisDiv.innerHTML = analysis;
-                resultDiv.style.display = 'block';
-                
-                // 滚动到结果区域
-                resultDiv.scrollIntoView({ behavior: 'smooth' });
-            }
+            // 特殊数字
+            if (qq.includes('888')) score += 20;
+            if (qq.includes('666')) score += 15;
+            if (qq.includes('520')) score += 10;
             
-            function showError(message) {
-                analysisDiv.innerHTML = `<div class="error">${message}</div>`;
-                resultDiv.style.display = 'block';
-                scoreValue.textContent = '0';
-            }
-        });
+            // 确保分数不超过100
+            score = Math.min(score, 100);
+            
+            // 显示结果
+            resultDiv.innerHTML = `
+                <h3>评估结果</h3>
+                <p><strong>QQ号：</strong> ${qq}</p>
+                <p><strong>综合评分：</strong> ${score}/100</p>
+                <p><strong>分析：</strong> ${
+                    score >= 80 ? '优秀号码！' : 
+                    score >= 60 ? '良好号码！' : '普通号码'
+                }</p>
+            `;
+            
+            console.log("评估完成，分数：" + score); // 调试信息
+        }
     </script>
 </body>
 </html>
